@@ -1,0 +1,23 @@
+{
+  "name": "lixy",
+  "version": "0.0.0",
+  "description": "Live proxy",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/termosa/lixy.git"
+  },
+  "keywords": [
+    "proxy",
+    "live"
+  ],
+  "author": "Stanislav Termosa <termosa.stanislav@gmail.com> (https://me.st/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/termosa/lixy/issues"
+  },
+  "homepage": "https://github.com/termosa/lixy#readme"
+}
