@@ -12,7 +12,11 @@
   },
   "keywords": [
     "proxy",
-    "live"
+    "live",
+    "lazy",
+    "dynamic",
+    "hot",
+    "reload"
   ],
   "author": "Stanislav Termosa <termosa.stanislav@gmail.com> (https://me.st/)",
   "license": "MIT",
