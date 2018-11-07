@@ -1,6 +1,6 @@
 {
   "name": "lixy",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Live proxy",
   "main": "index.js",
   "scripts": {
