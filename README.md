@@ -1,6 +1,6 @@
-# lixy is live proxy
+# lixy is live lazy proxy
 
-That means it lives an unpredictable life.
+Live means that it lives wonderful and unpredictable life.
 
 While you call to proxied object it stays a proxy unless you get a primitive
 value.
@@ -14,13 +14,19 @@ const math = {
   }
 };
 
-const { add } = lixy(() => math);
+const { add } = lixy.lazy(() => math);
 
 add(5, 3); // 8
 
 math.add = (a, b) => a - b;
 
 add(5, 3); // 2
+```
+
+If the root object will not change, the example above can be simplified:
+
+```
+const { add } = lixy(math);
 ```
 
 **Note:** proxified objects will always have the type `function` to handle the
