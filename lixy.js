@@ -1,3 +1,23 @@
+// Notes
+//  - Static code works better then a list of generated methods (Chrome can interactively show the result of execution
+//  - Should test the case when the object is replaced with the one that has/missed readonly properties
+//    - will proxy recalculate invariants?
+//    - if not, and it's not because we give it not the exact object, need to implement that check manually
+
+class LixyError extends Error {
+  constructor(...args) {
+    super(...args)
+    Error.captureStackTrace(this, lixy)
+  }
+}
+
+class LixyLazyError extends Error {
+  constructor(...args) {
+    super(...args)
+    Error.captureStackTrace(this, lazy)
+  }
+}
+
 const isObject = value => typeof value === 'object' || typeof value === 'function'
 
 const resolve = (src, nest) => {
@@ -24,31 +44,36 @@ const handlerNames = [
 ]
 
 const handler = handlerNames.reduce((handler, name) => {
-  return Object.assign(handler, { [name]: (target, ...args) => {
-    const src = resolve(target.source, target.nest)
-    return Reflect[name](src, ...args)
+  return Object.assign(handler, { [name]: (src, ...args) => {
+    const target = resolve(src.getter(), src.nest)
+    return Reflect[name](target, ...args)
   }})
 }, {
-  get(target, prop) {
-    const src = resolve(target.source, target.nest)
-    const value = Reflect.get(src, prop)
+  get(src, prop) {
+    const target = resolve(src.getter(), src.nest)
+    const value = Reflect.get(target, prop)
     if (typeof value !== 'function' && typeof value !== 'object')
       return value
-    return proxify(target.source, target.options, target.nest.concat(prop))
+    return proxify(src.getter, false, src.nest.concat(prop))
   }
 })
 
-const proxify = (source, options, nest = []) => {
-  const target = options.safeType || typeof source === 'function' ? () => {} : {}
-  Object.assign(target, { nest, options, source })
-  return new Proxy(target, handler)
+const proxify = (getter, lazy, nest = []) => {
+  if (lazy) {
+    if (typeof getter !== 'function')
+      throw new LixyLazyError('Target of lazy proxy must be a function')
+  } else {
+    const target = getter()
+    if (typeof target !== 'function' && typeof target !== 'object')
+      throw new LixyError('Target of proxy must be a function or an object (primitives are not supported)')
+  }
+  const src = lazy || typeof resolve(getter(), nest) === 'function' ? () => {} : {}
+  Object.assign(src, { getter, nest })
+  return new Proxy(src, handler)
 }
 
-const defaults = {
-  safeType: true // always use function as a target
-}
+const lixy = target => proxify(() => target)
+const lazy = getter => proxify(getter, 'lazy')
 
-const lixy  = (target, options) =>
-  proxify(target, Object.assign({}, defaults, options))
-
-module.exports = lixy
+exports = module.exports = lixy
+exports.lazy = lazy;

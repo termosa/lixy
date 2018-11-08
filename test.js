@@ -14,8 +14,17 @@ assert(f() === 1)
 o.s.f = () => 2
 assert(f() === 2)
 
-assert(typeof lixy({}) === 'function')
+assert(typeof lixy({}) === 'object')
+assert(typeof lixy(() => {}) === 'function')
 assert(typeof lixy({}, { safeType: false }) === 'object')
+
+let fs = { a: 1 }
+let fp = lixy.lazy(() => fs)
+assert(fp.a === 1);
+fs = () => 3
+assert(fp() === 3);
+
+lixy(1)
 
 assert('b' in lixy({ a: { b: 1 } }).a)
 
